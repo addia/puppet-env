@@ -2,7 +2,7 @@ forge 'https://forgeapi.puppetlabs.com'
 
 
 # Dependency modules
-mod 'camptocamp-openssl',              '1.8.2'
+mod 'camptocamp-openssl',              '1.9.0'
 mod 'camptocamp-systemd',              '0.4.0'
 mod 'puppet-selinux',                  '0.8.0'
 mod 'leinaddm-htpasswd',               '0.0.3'
