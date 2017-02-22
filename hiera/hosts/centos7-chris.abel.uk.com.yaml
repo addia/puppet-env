@@ -1,0 +1,101 @@
+---
+
+  classes:
+    - 'nginx'
+
+
+  # the main config file: /etc/nginx/nginx.conf
+  # -------------------------------------------
+  nginx::log_format: 
+    main:              '$http_x_forwarded_for - $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"'
+  nginx::http_format_log:            'main'
+
+  nginx::proxy_set_header:   ['Host:                  $http_host','X-Forwarded-Proto:     $scheme','X-Real-IP:             $remote_addr','X-NginX-Proxy:         true','Connection:            false','X-Forwarded-By:        $server_addr:$server_port']
+
+  nginx::proxy_read_timeout: '60'
+  nginx::proxy_redirect:     'off'
+  nginx::proxy_http_version: '1.1'
+  nginx::proxy_pass_header:  ['server']
+  nginx::real_ip_header:     'proxy_protocol'
+
+
+  # an example nginx vhost config: /etc/nginx/sites-available/frontend.conf
+  # -----------------------------------------------------------------------
+  nginx::nginx_vhosts:
+    'frontend':
+      server_name:                   ['centos-nginx.abel.uk.com']
+      listen_port:                    80
+      ssl:                            false
+      add_header:
+        Cache-Control:               'no-cache'
+        X-Content-Type-Options:      'nosniff'
+        X-Frame-Options:             'SAMEORIGIN'
+      access_log:                    '/var/log/nginx/frontend-access.log'
+      error_log:                     '/var/log/nginx/frontend-errors.log'
+      format_log:                    'main'
+      use_default_location:           false
+      www_root:                      '/usr/share/frontend/share/'
+      index_files:                   ['index.php']
+
+
+  # an example nginx vhost location
+  # -------------------------------
+  nginx::nginx_locations:
+    'favicon':
+      vhost:                         'frontend'
+      priority:                       501
+      location:                      '~ favicon.ico'
+      location_alias:                'icons/favicon.ico'
+      index_files:                   [] 
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+        expires:                     'max'
+
+    'status':
+      vhost:                         'frontend'
+      priority:                       502
+      location:                      '/nginx_status'
+      stub_status:                    true
+      index_files:                   [] 
+      location_allow:                ['127.0.0.1','138.201.57.75','136.243.156.71','81.128.179.58']
+      location_deny:                 ['all']
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+
+    'style':
+      vhost:                         'frontend'
+      priority:                       511
+      index_files:                   [] 
+      location:                      '/style/'
+      www_root:                      '/var/www/error'
+
+    'overseas':
+      vhost:                         'frontend'
+      priority:                       512
+      index_files:                   []
+      proxy_pass:                    'http://internal-prod-overseas-data-internal-lb-1002495663.eu-central-1.elb.amazonaws.com:5000'
+      location_custom_cfg:
+        access_log:                  '/var/log/nginx/data_pub_overseas_frontend_proxy.access.log'
+        error_log:                   '/var/log/nginx/data_pub_overseas_frontend_proxy.error.log'
+
+    'nps':
+      vhost:                         'frontend'
+      priority:                       513
+      index_files:                   []
+      proxy_pass:                    'http://internal-prod-nps-data-internal-lb-84233938.eu-central-1.elb.amazonaws.com:5050'
+      location_custom_cfg:
+        access_log:                  '/var/log/nginx/data_pub_nps_frontend_proxy.access.log'
+        error_log:                   '/var/log/nginx/data_pub_nps_frontend_proxy.error.log'
+
+    'fallback': 
+      vhost:                         'frontend'
+      priority:                       514
+      location:                      '/'
+      index_files:                   []
+      location_custom_cfg:
+        access_log:                  '/var/log/nginx/data_pub_redirect.access.log main'
+        error_log:                   '/var/log/nginx/data_pub_redirect.error.log'
+        rewrite:                     [' ^(.*)  http://landregistry.gov.uk permanent']
+

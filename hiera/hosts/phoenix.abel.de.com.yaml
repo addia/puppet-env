@@ -1,0 +1,183 @@
+---
+
+  classes:
+    - 'nginx'
+    - 'nagiosclient'
+    - 'nagios'
+
+
+  # the main config file: /etc/nginx/nginx.conf
+  # -------------------------------------------
+  nginx::load_modules:               ['mods-enabled/fancyindex.conf']
+  nginx::load_rules:                 ['nginx-access.rules']
+  nginx::log_format: 
+    main:    '$http_x_forwarded_for - $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"'
+    scripts: '$document_root$fastcgi_script_name > $request'
+  nginx::http_format_log:            'main'
+
+
+  # an example nginx vhost config: /etc/nginx/sites-available/nagios.conf
+  # ---------------------------------------------------------------------
+  nginx::nginx_vhosts:
+    'nagios':
+      server_name:                   ['monitor.abel.systems']
+      load_module_configs:           ['mods-enabled/validate.conf']
+      listen_port:                    80
+      ssl_port:                       443
+      http2:                          'on'
+      ssl:                            true
+      ssl_redirect:                   true
+      ssl_cert:                      'ssl/abel.systems.crt'
+      ssl_key:                       'ssl/abel.systems.key'
+      ssl_trusted_cert:              'ssl/StartCom_Chain.crt'
+      ssl_dhparam:                   'ssl/dhparam.pem'
+      ssl_protocols:                 'TLSv1.2'
+      ssl_ciphers:                   'EECDH+AESGCM:EDH+AESGCM:EECDH:EDH:!MD5:!RC4:!LOW:!MEDIUM:!CAMELLIA:!ECDSA:!DES:!DSS:!3DES:!NULL'
+      ssl_stapling:                  true
+      ssl_stapling_verify:           true
+      ssl_session_timeout:           '1d'
+      ssl_session_tickets:           'off'
+      ssl_ecdh_curve:                'secp384r1'
+      ssl_cache:                     'shared:SSL:10m'
+      resolver:                      ['8.8.4.4', '8.8.8.8', 'valid=300s']
+      resolver_timeout:              '6s'
+      add_header:
+        Cache-Control:               'no-cache'
+        Strict-Transport-Security:   'max-age=15768000; includeSubDomains; preload'
+        X-Content-Type-Options:      'nosniff'
+        X-Frame-Options:             'SAMEORIGIN'
+      access_log:                    '/var/log/nginx/nagios-access.log'
+      error_log:                     '/var/log/nginx/nagios-errors.log'
+      format_log:                    'main'
+      use_default_location:           false
+      www_root:                      '/usr/share/nagios/share/'
+      index_files:                   ['index.php']
+
+      auth_basic:                    "Nagios Restricted Access"
+      auth_basic_user_file:          '/etc/nagios/passwd'
+
+      include_files:                 ['mods-enabled/error.conf']
+
+
+  # an example nginx vhost location
+  # -------------------------------
+  nginx::nginx_locations:
+    'favicon':
+      vhost:                         'nagios'
+      priority:                       501
+      location:                      '~ favicon.ico'
+      ssl:                            true
+      ssl_only:                       true
+      location_alias:                'icons/favicon.ico'
+      index_files:                   [] 
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+        expires:                     'max'
+
+    'style':
+      vhost:                         'nagios'
+      priority:                       502
+      location:                      '/stylesheets'
+      ssl:                            true
+      ssl_only:                       true
+      location_alias:                '/usr/share/nagios/share/stylesheets'
+      index_files:                   [] 
+
+    'status':
+      vhost:                         'nagios'
+      priority:                       503
+      location:                      '= /nginx_status'
+      ssl:                            true
+      ssl_only:                       true
+      stub_status:                    true
+      index_files:                   [] 
+      location_allow:                 ['127.0.0.1','138.201.57.75','136.243.156.71','81.128.179.58']
+      location_deny:                  ['all']
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+
+    'pnp4nag':
+      vhost:                         'nagios'
+      priority:                       511
+      location:                      '/pnp4nagios'
+      index_files:                   []
+      ssl:                            true
+      ssl_only:                       true
+      www_root:                      '/usr/share/pnp4nagios/share'
+
+    'pnp4nag_php':
+      vhost:                         'nagios'
+      priority:                       512
+      location:                      '~ ^(/pnp4nagios.*\.php)(.*)$'
+      index_files:                   []
+      ssl:                            true
+      ssl_only:                       true
+      www_root:                      '/usr/share/pnp4nagios/share'
+      location_custom_cfg:
+        fastcgi_index:               []
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_split_path_info:      ^(.+\.php)(.*)$      
+        fastcgi_param PATH_INFO:      $fastcgi_path_info
+        fastcgi_param SCRIPT_FILENAME: $document_root/index.php
+        fastcgi_pass:                 unix:/run/php-fpm/nagios.sock
+
+    'nag_cgi':
+      vhost:                         'nagios'
+      priority:                       513
+      location:                      '~ .cgi$'
+      index_files:                   []
+      ssl:                            true
+      ssl_only:                       true
+      www_root:                      '/usr/share/nagios/sbin/'
+      location_custom_cfg:
+        rewrite:                      ^/cgi-bin/(.*).cgi /$1.cgi break
+        fastcgi_index:               []
+        fastcgi_param AUTH_USER:      $remote_user
+        fastcgi_param REMOTE_USER:    $remote_user
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_pass:                 unix:/run/fcgiwrap.sock
+        fastcgi_param SCRIPT_FILENAME: $document_root/$fastcgi_script_name
+        fastcgi_param PATH_INFO:      $fastcgi_script_name
+
+    'nag_php':
+      vhost:                         'nagios'
+      priority:                       514
+      location:                      '~ .php$'
+      index_files:                   []
+      ssl:                            true
+      ssl_only:                       true
+      try_files:                     ['$uri = 404']
+      location_custom_cfg:
+        fastcgi_pass:                 unix:/run/php-fpm/nagios.sock
+        fastcgi_index:                index.php
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_param PATH_INFO:      $fastcgi_script_name
+
+    'media':
+      vhost:                         'nagios'
+      priority:                       515
+      location:                      '~ media'
+      ssl:                            true
+      ssl_only:                       true
+      www_root:                      '/usr/share/pnp4nagios/share/media/'
+      index_files:                   [] 
+      location_custom_cfg:
+        rewrite:                      ^/pnp4nagios/media/(.*) /$1 break
+        access_log:                  'off'
+        expires:                     'max'
+
+    'nag_all':
+      vhost:                         'nagios'
+      priority:                       516
+      location:                      '~'
+      ssl:                            true
+      ssl_only:                       true
+      www_root:                      '/usr/share/nagios/share/'
+      index_files:                   [] 
+      location_custom_cfg:
+        rewrite:                      ^/nagios/(.*) /$1 break
+        access_log:                  'off'
+        expires:                     'max'
+

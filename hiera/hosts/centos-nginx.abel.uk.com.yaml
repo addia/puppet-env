@@ -1,0 +1,140 @@
+---
+
+  classes:
+    - 'nginx'
+
+
+  # the main config file: /etc/nginx/nginx.conf
+  # -------------------------------------------
+  nginx::log_format: 
+    main:              '$http_x_forwarded_for - $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"'
+  nginx::http_format_log:            'main'
+
+  nginx::proxy_set_header:   ['Host:                  $http_host','X-Forwarded-Proto:     $scheme','X-Real-IP:             $remote_addr','X-NginX-Proxy:         true','Connection:            false','X-Forwarded-By:        $server_addr:$server_port']
+
+  # an example nginx vhost config: /etc/nginx/sites-available/nagios.conf
+  # ---------------------------------------------------------------------
+  nginx::nginx_vhosts:
+    'nagios':
+      server_name:                   ['centos-nginx.abel.uk.com']
+      listen_port:                    80
+      ssl:                            false
+      add_header:
+        Cache-Control:               'no-cache'
+        X-Content-Type-Options:      'nosniff'
+        X-Frame-Options:             'SAMEORIGIN'
+      access_log:                    '/var/log/nginx/nagios-access.log'
+      error_log:                     '/var/log/nginx/nagios-errors.log'
+      format_log:                    'main'
+      use_default_location:           false
+      www_root:                      '/usr/share/nagios/share/'
+      index_files:                   ['index.php']
+
+      auth_basic:                    "Nagios Restricted Access"
+      auth_basic_user_file:          '/etc/nagios/passwd'
+
+
+  # an example nginx vhost location
+  # -------------------------------
+  nginx::nginx_locations:
+    'favicon':
+      vhost:                         'nagios'
+      priority:                       501
+      location:                      '~ favicon.ico'
+      location_alias:                'icons/favicon.ico'
+      index_files:                   [] 
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+        expires:                     'max'
+
+    'style':
+      vhost:                         'nagios'
+      priority:                       502
+      location:                      '/stylesheets'
+      location_alias:                '/usr/share/nagios/share/stylesheets'
+      index_files:                   [] 
+
+    'status':
+      vhost:                         'nagios'
+      priority:                       503
+      location:                      '/nginx_status'
+      stub_status:                    true
+      index_files:                   [] 
+      location_allow:                 ['127.0.0.1','138.201.57.75','136.243.156.71','81.128.179.58']
+      location_deny:                  ['all']
+      location_custom_cfg:
+        log_not_found:               'off'
+        access_log:                  'off'
+
+    'pnp4nag':
+      vhost:                         'nagios'
+      priority:                       511
+      location:                      '/pnp4nagios'
+      index_files:                   []
+      www_root:                      '/usr/share/pnp4nagios/share'
+
+    'pnp4nag_php':
+      vhost:                         'nagios'
+      priority:                       512
+      location:                      '~ ^(/pnp4nagios.*\.php)(.*)$'
+      index_files:                   []
+      www_root:                      '/usr/share/pnp4nagios/share'
+      location_custom_cfg:
+        fastcgi_index:               []
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_split_path_info:      ^(.+\.php)(.*)$      
+        fastcgi_param PATH_INFO:      $fastcgi_path_info
+        fastcgi_param SCRIPT_FILENAME: $document_root/index.php
+        fastcgi_pass:                 unix:/run/php-fpm/nagios.sock
+
+    'nag_cgi':
+      vhost:                         'nagios'
+      priority:                       513
+      location:                      '~ .cgi$'
+      index_files:                   []
+      www_root:                      '/usr/share/nagios/sbin/'
+      location_custom_cfg:
+        rewrite:                      ^/cgi-bin/(.*).cgi /$1.cgi break
+        fastcgi_index:               []
+        fastcgi_param AUTH_USER:      $remote_user
+        fastcgi_param REMOTE_USER:    $remote_user
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_pass:                 unix:/run/fcgiwrap.sock
+        fastcgi_param SCRIPT_FILENAME: $document_root/$fastcgi_script_name
+        fastcgi_param PATH_INFO:      $fastcgi_script_name
+
+    'nag_php':
+      vhost:                         'nagios'
+      priority:                       514
+      location:                      '~ .php$'
+      index_files:                   []
+      try_files:                     ['$uri = 404']
+      location_custom_cfg:
+        fastcgi_pass:                 unix:/run/php-fpm/nagios.sock
+        fastcgi_index:                index.php
+        include:                      mods-enabled/fastcgi_params
+        fastcgi_param PATH_INFO:      $fastcgi_script_name
+
+    'media':
+      vhost:                         'nagios'
+      priority:                       515
+      location:                      '~ media'
+      www_root:                      '/usr/share/pnp4nagios/share/media/'
+      index_files:                   [] 
+      location_custom_cfg:
+        rewrite:                      ^/pnp4nagios/media/(.*) /$1 break
+        access_log:                  'off'
+        expires:                     'max'
+
+    'nag_all':
+      vhost:                         'nagios'
+      priority:                       516
+      location:                      '~'
+      www_root:                      '/usr/share/nagios/share/'
+      index_files:                   [] 
+      location_custom_cfg:
+        rewrite:                      ^/nagios/(.*) /$1 break
+        access_log:                  'off'
+        expires:                     'max'
+

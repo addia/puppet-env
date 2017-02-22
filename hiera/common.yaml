@@ -1,0 +1,20 @@
+---
+
+
+# notify {"loading common.yaml  ${::fqdn}": loglevel => debug,}
+
+# common packages
+# ---------------
+
+classes:
+  - 'sudo'
+  - 'systemd'
+
+
+# common hiera variables:
+# -----------------------
+
+nagios_server_name: 'phoenix.abel.de.com'
+
+nagios_server_ip: '138.201.57.75'
+
