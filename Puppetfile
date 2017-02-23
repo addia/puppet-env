@@ -13,7 +13,7 @@ mod 'puppet-staging',                  '2.2.0'
 mod 'garethr-erlang',                  '0.3.0'
 mod 'maestrodev-wget',                 '1.7.3'
 mod 'puppet-selinux',                  '0.8.0'
-mod 'puppetlabs-rabbitmq',             '5.6.0'
+mod 'puppetlabs-rabbitmq',             '5.6.0'  --ignore-dependencies
 mod 'camptocamp-openssl',              '1.9.0'
 mod 'camptocamp-systemd',              '0.4.0'
 mod 'richardc-datacat',                '0.6.2'
@@ -22,7 +22,7 @@ mod 'leinaddm-htpasswd',               '0.0.3'
 mod 'onyxpoint-gpasswd',               '1.0.0'
 mod 'saz-sudo',                        '3.1.0'
 mod 'thias-php',                       '1.2.0'
-mod 'elasticsearch-elasticsearch',     '0.16.2'
+mod 'elasticsearch-elasticsearch',     '0.16.2'  --ignore-dependencies
 
 mod 'puppet-nagios',                   :git => 'https://github.com/addia/puppet-nagios.git',
 mod 'puppet-nagiosclient',             :git => 'https://github.com/addia/puppet-nagiosclient.git',
