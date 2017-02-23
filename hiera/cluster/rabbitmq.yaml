@@ -1,0 +1,42 @@
+---
+
+# rabbitmq hiera variables:
+# ---------------------------
+
+
+classes:
+  - rabbit
+
+
+ssl_self_signed_ca_cert: undef
+
+rabbitmq_clustername: addis-rabbit-cluster
+
+rabbitmq_data_nic:  eth0
+
+rabbitmq_address: 192.168.122.180
+
+rabbitmq_master: 192.168.122.180
+
+rabbitmq_servers:  ['192.168.122.180']
+
+rabbitmq_cookie:  "bxBAEg3rU2D8W2K3DLKF"
+
+rabbitmq_passwd:  "NDNUNA5uWkhPpnTt"
+
+logstash_passwd:  "WFArjrag87fEmJma"
+
+logstash_key:  "BLX7ELZSSG8ZSM7W"
+
+rabbitmq_origin_conf: false
+
+rabbitmq_origin: undef
+
+rabbitmq_origin_passwd: undef
+
+rabbitmq_origin_passkey: undef
+
+
+
+# -----------------------
+# vim: set ts=2 sw=2 et :
