@@ -1,10 +1,10 @@
 ---
 
-
-# notify {"loading common.yaml  ${::fqdn}": loglevel => debug,}
-
 # common packages
 # ---------------
+
+notify {"loading common.yaml  ${::fqdn}": }
+
 
 classes:
   - 'sudo'
