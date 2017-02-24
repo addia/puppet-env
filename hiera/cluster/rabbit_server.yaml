@@ -3,11 +3,9 @@
 # rabbit_server hiera variables:
 # ------------------------------
 
-notify {"loading rabbit_server.yaml  ${::fqdn}": }
-
 
 classes:
-  - rabbit
+  - 'rabbit'
 
 
 ssl_self_signed_ca_cert: addis_cacert.pem

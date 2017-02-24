@@ -19,6 +19,10 @@ exec { 'fix_the_windows_hostname_pants':
 }
 
 # Create 'sysadm' group on all hosts
+group { 'cdrom' :
+  ensure => present,
+  gid    => 36
+}
 group { 'sysadm' :
   ensure => present,
   gid    => 11
@@ -103,7 +107,8 @@ user { root :
 
 # the sshd protection
 group { ssh-users :
-  members  => ['root','addi']
+  gid     => 101,
+  members => ['root','addi']
 }
 
 # Add the sysadm account
@@ -113,6 +118,13 @@ user { 'addi' :
   gid      => 11,
   password => '$6$MgJRLSON$ld4OjNIMdc9YVNPWfhauERVyoaOaThRaPXQqf2gmnNVNfGqiwCdEgjgiWJpq8HyZ8kbvSGAS2zqlL3ZylIOPk0',
   require  => Group['sysadm']
+}
+
+ssh_authorized_key { 'Addis rsa key':
+  ensure => present,
+  user   => 'addi',
+  type   => 'ssh-rsa',
+  key    => 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCsFVhM9SHWwUvI6G8ucDAt9swHEoXm17iozlPUfriHBNexXJcjXvB5CLhZGrllqYrikVzicyKUEMPiQU78GKaos0rhoe8IalPGKwbcTaAFHkzBjaOd  9bLpDVv9LAir3gHmfTw8koulmwl3r4AuEv3WdoRCTrddtqq7FmSFOby8yP6Yvt5ELhzpKxTZj4BJSlNQaGWRNVR/ObbIq4Qp6pbLpNh9oqcpZmuzLrURFck7a6TX3nlhgWRK7XYmcxPsR5vpNRVZruRNXQ2fF3mr5xakmqn  H0YK9xhbMdVKF0C3xnkFKpUIp/iXGCIq86Y5IjQCXRZzL7dEoRND68q6docGzq2iZEUSo3fiLGuw50KUFdNUhY8qYxgoX7oL9bprD9TYg5dEyQLRzBxQUon2C0pGLGBdN4gVEmzK+Z0F0malH7i/15EjkE32Y/1fz0L63rG  P9sRo9mRQR5T5ahQlNoBY5j9oJlDYpSNf9hJjFQWYZZuXOzOpUdHI2Qlxykr3Deut5GCzKZWFIlf4c8ZCHoNk9nPT+3YJityCDR5DpI+6a1lG7My3hfkQgFgzv7UrSU3aooY3zRJX7fHRxJagP43uuLVzkjU5rGuCLoVyWM  0BKBwe2O6LxjKuxAh5iUVAZX3prUJu/5qrDG06ZAUrRmy3RW5PrIlq5ZIANPYTWmyl9Yw=='
 }
 
 # Default executable path
