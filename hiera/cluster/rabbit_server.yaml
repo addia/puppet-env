@@ -1,14 +1,16 @@
 ---
 
-# rabbitmq hiera variables:
-# ---------------------------
+# rabbit_server hiera variables:
+# ------------------------------
+
+notify {"loading rabbit_server.yaml  ${::fqdn}": }
 
 
 classes:
   - rabbit
 
 
-ssl_self_signed_ca_cert: undef
+ssl_self_signed_ca_cert: addis_cacert.pem
 
 rabbitmq_clustername: addis-rabbit-cluster
 
