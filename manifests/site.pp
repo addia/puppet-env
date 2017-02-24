@@ -2,10 +2,10 @@
 # Site Defaults
 #
 
-notify{"Server: ${::fqdn}": loglevel => debug,}
-notify{"Network Location: ${::network_location}": loglevel => debug,}
-notify{"Environment: ${::puppet_environment}": loglevel => debug,}
-notify{"Cluster: ${::cluster}": loglevel => debug,}
+notify{"Server: ${::fqdn}": }
+notify{"Network Location: ${::network_location}": }
+notify{"Environment: ${::puppet_environment}": }
+notify{"Cluster: ${::cluster}": }
 
 
 # Include all hiera classes
