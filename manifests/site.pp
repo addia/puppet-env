@@ -5,7 +5,7 @@
 notify{"Server: ${::fqdn}": loglevel => debug,}
 notify{"Network Location: ${::network_location}": loglevel => debug,}
 notify{"Environment: ${::puppet_environment}": loglevel => debug,}
-notify{"Server Type: ${::server_type}": loglevel => debug,}
+notify{"Cluster: ${::cluster}": loglevel => debug,}
 
 
 # Include all hiera classes
