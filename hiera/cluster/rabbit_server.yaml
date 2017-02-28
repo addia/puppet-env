@@ -28,6 +28,14 @@ logstash_passwd:  "WFArjrag87fEmJma"
 
 logstash_key:  "BLX7ELZSSG8ZSM7W"
 
+rabbitmq_server_key: ""
+
+rabbitmq_server_cert: ""
+
+rabbitmq_client_key: ""
+
+rabbitmq_client_cert: ""
+
 rabbitmq_origin_conf: false
 
 rabbitmq_origin: undef
