@@ -12,7 +12,7 @@ els_version: "5.2.2"
 
 els_java_version: "1.8.0"
 
-els_ssl_enable: true
+els_ssl_enable: undef
 
 els_api_protocol: "http"
 
