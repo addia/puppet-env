@@ -14,7 +14,7 @@ els_java_version: "1.8.0"
 
 els_ssl_enable: true
 
-els_tls_enable: true
+els_api_protocol: "http"
 
 els_keystore_pass: ""
 
