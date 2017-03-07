@@ -1,0 +1,48 @@
+---
+
+# elastic server hiera variables:
+# -------------------------------
+
+
+classes:
+  - 'elastic'
+
+
+els_version: "5.2.2"
+
+els_java_version: "1.8.0"
+
+els_ssl_enable: true
+
+els_tls_enable: true
+
+els_keystore_pass: ""
+
+els_clustername: "test-cluster"
+
+els_instance: "test-els"
+
+els_minimum_nodes: 2
+
+els_requires_nodes: 2
+
+els_servers: ['192.168.122.190','192.168.122.191','192.168.122.192']
+
+els_do_housekeeping: true
+
+els_days_to_keep: 30
+
+els_index_prefix: ['logstash']
+
+els_jvm_options: ['-Xms256m','-Xmx1g']
+
+root_ca_cert: ""
+
+els_elastic_key: ""
+
+els_elastic_cert: ""
+
+
+
+# -----------------------
+# vim: set ts=2 sw=2 et :
