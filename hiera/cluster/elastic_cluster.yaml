@@ -38,7 +38,7 @@ els_days_to_keep: 30
 
 els_index_prefix: ['logstash']
 
-els_jvm_options: ['-Xms256m','-Xmx1g']
+els_jvm_options: ['-Xms512m','-Xmx512m']
 
 root_ca_cert: ""
 
