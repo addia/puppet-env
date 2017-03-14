@@ -12,39 +12,15 @@ els_version: "5.2.2"
 
 els_java_package: "java-1.8.0-openjdk"
 
-els_ssl_enable: ""
-
-els_system_key: ""
-
-els_security_plugin: ""
-
-els_api_protocol: "http"
-
-els_keystore_pass: ""
-
 els_clustername: "test-cluster"
 
 els_instance: "test-els"
 
-els_minimum_nodes: 2
-
-els_requires_nodes: 2
-
-els_servers: ['192.168.122.190','192.168.122.191','192.168.122.192']
-
-els_do_housekeeping: true
-
-els_days_to_keep: 30
+els_servers: ['192.168.122.190']
 
 els_index_prefix: ['logstash']
 
 els_jvm_options: ['-Xms512m','-Xmx512m']
-
-root_ca_cert: ""
-
-els_elastic_key: ""
-
-els_elastic_cert: ""
 
 
 
