@@ -17,7 +17,7 @@ mod 'puppetlabs-rabbitmq',             '5.6.0'  --ignore-dependencies
 mod 'camptocamp-openssl',              '1.9.0'
 mod 'camptocamp-systemd',              '0.4.0'
 mod 'richardc-datacat',                '0.6.2'
-mod 'pcfens-ca_cert',                  '1.6.1'
+mod 'pcfens-ca_cert',                  '1.3.0'
 mod 'leinaddm-htpasswd',               '0.0.3'
 mod 'onyxpoint-gpasswd',               '1.0.0'
 mod 'saz-sudo',                        '3.1.0'
